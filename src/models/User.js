@@ -1,11 +1,11 @@
-const mongoose = require('mongoose')
+const {Schema, model} = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Project = require('./Project')
 require('dotenv').config()
 
-const userSchema = mongoose.Schema({
+const userSchema = Schema({
   username: {
     type: String,
     required: true,
@@ -22,13 +22,22 @@ const userSchema = mongoose.Schema({
       }
     }
   },
-  firstName: String,
-  lastName: String,
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
   email: {
     type: String,
     unique: true,
     required: true,
     trim: true,
+    lowercase: true,
     validate(value){
       if(!validator.isEmail(value)){
         throw new Error('Email invalid')
@@ -52,24 +61,32 @@ const userSchema = mongoose.Schema({
   }]
 })
 
+// Virtual Property
+userSchema.virtual('projects', {
+  ref: 'Project',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
 // To generate auth Token
 userSchema.methods.generateAuthToken = async function() {
   const user = this
   const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET)
 
-  User.tokens = user.tokens.concat( {token} )
+  user.tokens = user.tokens.concat({token})
 
   await user.save()
+
   return token
 }
 
 // To search user and validate credentials
-userSchema.statics.findByCredentials = async ( email, password ) => {
-  const user = await user.findOne({ email })
+userSchema.statics.findByCredentials = async ( username, password ) => {
+  const user = await User.findOne({ username })
   const isMatch = await bcrypt.compare(password, user.password)
 
   if(!user || !isMatch) {
-    throw new Error('Login error')
+    throw new Error('Login error!')
   }
 
   return user
@@ -95,6 +112,6 @@ userSchema.pre('remove', async function(next) {
   next()
 })
 
-const User = mongoose.model('User', userSchema)
+const User = model('User', userSchema)
 
 module.exports = User

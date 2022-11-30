@@ -2,7 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 
-const userRoute = require('./router/user')
+const userRoute = require('./router/userRoute')
 const connectDB = require('./database/db')
 
 require('dotenv').config()
@@ -19,7 +19,7 @@ app.use(morgan('dev'))
 app.use(cors())
 
 // Routes
-app.use('/users/',userRoute)
+app.use('/users/', userRoute)
 
 // Welcome route
 app.get('/', (req,res)=> {
