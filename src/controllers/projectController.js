@@ -4,9 +4,11 @@ const AllUserProjects = async (req, res) =>{
   try {
     const alluserProjects = await Project.find({owner: req.user._id})
     res.status(200).json(alluserProjects)
+
   } catch (error) {
     console.log(error)
     res.status(400).send(error)
+    
   }
 }
 
@@ -15,9 +17,11 @@ const OneUserProject = async (req,res)=>{
   try {
     const project = await Project.findOne({owner: req.user._id, _id: id})
     res.status(200).json(project)
+
   } catch (error) {
     console.log(error)
     res.status(404).send(error)
+
   }
 }
 
@@ -31,8 +35,8 @@ const CreateProject = async (req,res) => {
     await project.save()
     return res.status(201).send(project)
   } catch (error) {
-    console.log(error)
     res.status(500).send(error)
+
   }
 }
 
@@ -44,14 +48,15 @@ const UpdateProject = async (req,res) => {
     const project = await Project.findOne({owner: req.user._id, _id: id})
 
     if(!project) {
-      return res.status(404).send({msg: "Project doesn't exist"})
+      return res.status(404).send({msg: "Project not found"})
     }
 
     await Project.findOneAndUpdate({owner: req.user._id, _id: id},{ name })
     return res.status(200).send(await Project.findOne({owner: req.user._id, _id: id}))
+
   } catch (error) {
-    console.log(error)
     return res.status(500).send(error)
+
   }
 }
 
@@ -62,14 +67,15 @@ const DeleteProject = async (req,res) => {
     const project = await Project.findOne({owner: req.user._id, _id: id})
 
     if(!project) {
-      return res.status(404).send(project)
+      return res.status(404).send({msg:"Project not found"})
     }
     
     await Project.findOneAndDelete({owner: req.user._id, _id: id})
     return res.status(200).json(project)
+
   } catch (error) {
-    console.log(error)
     return res.status(400).send(error)
+
   }
 }
 
