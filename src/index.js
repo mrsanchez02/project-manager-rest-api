@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 
 const userRoute = require('./router/userRoute')
+const projectsRoute = require('./router/projectsRoute')
 const connectDB = require('./database/db')
 
 require('dotenv').config()
@@ -20,6 +21,7 @@ app.use(cors())
 
 // Routes
 app.use('/users/', userRoute)
+app.use('/projects', projectsRoute)
 
 // Welcome route
 app.get('/', (req,res)=> {
